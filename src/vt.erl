@@ -1,6 +1,6 @@
 -module(vt).
 
-%% Application callbacks
+%% API
 -export([start/0,
          stop/0]).
 
