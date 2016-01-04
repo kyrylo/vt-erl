@@ -9,7 +9,11 @@
 %%====================================================================
 
 start() ->
-    application:start(vt).
+    ok = application:start(crypto),
+    ok = application:start(ranch),
+    ok = application:start(cowlib),
+    ok = application:start(cowboy),
+    ok = application:start(vt).
 
 stop() ->
     application:stop(vt).
