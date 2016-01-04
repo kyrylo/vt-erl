@@ -37,7 +37,6 @@ handle_cast(accept, State = #state{socket=ListenSocket}) ->
     case gen_tcp:accept(ListenSocket) of
         {ok, AcceptSocket} ->
             vt_tcp_server_sup:start_socket(),
-            io:format("New connection initiated~n"),
             {noreply, State#state{socket=AcceptSocket}};
         {error, Reason} ->
             error_logger:error_msg("Error in ~p: ~p~n", [?MODULE, Reason]),
@@ -47,7 +46,6 @@ handle_cast(accept, State = #state{socket=ListenSocket}) ->
 handle_info({tcp, _Socket, Data}, State) ->
     {noreply, State};
 handle_info({tcp_closed, _Socket}, State) ->
-    io:format("Connection closed~n"),
     {stop, normal, State};
 handle_info({tcp_error, _Socket, Reason}, State) ->
     error_logger:error_msg("Error in ~p: ~p~n", [?MODULE, Reason]),
