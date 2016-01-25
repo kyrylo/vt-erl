@@ -25,6 +25,8 @@ start(_StartType, _StartArgs) ->
                   }]),
     {ok, _} = cowboy:start_http(http_listener, 100, [{port, 7332}],
                                 [{env, [{dispatch, Dispatch}]}]),
+
+    lager:set_loglevel(lager_console_backend, info),
     vt_sup:start_link().
 
 %%--------------------------------------------------------------------
