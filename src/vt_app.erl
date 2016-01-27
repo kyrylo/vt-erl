@@ -18,6 +18,8 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
+    lager:set_loglevel(lager_console_backend, info),
+
     Dispatch = cowboy_router:compile(
                  [{'_',
                    [
@@ -25,14 +27,12 @@ start(_StartType, _StartArgs) ->
                     {"/ws", vt_ws_handler, []}
                    ]
                   }]),
-    lager:info("~p:init ~~ Starting an HTTP server - 127.0.0.1:~p",
+    lager:info("~p:init ~~ Starting an HTTP server - http://127.0.0.1:~p",
                [?MODULE, ?HTTP_PORT]),
-    lager:info("~p:init ~~ Starting a WebSocket server - 127.0.0.1:~p/ws",
+    lager:info("~p:init ~~ Starting a WebSocket server - ws://127.0.0.1:~p/ws",
                [?MODULE, ?HTTP_PORT]),
     {ok, _} = cowboy:start_http(http_listener, 100, [{port, ?HTTP_PORT}],
                                 [{env, [{dispatch, Dispatch}]}]),
-
-    lager:set_loglevel(lager_console_backend, info),
     vt_sup:start_link().
 
 %%--------------------------------------------------------------------

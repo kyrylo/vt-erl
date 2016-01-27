@@ -5,6 +5,8 @@
         ,websocket_info/3]).
 
 init(Req, Opts) ->
+    lager:info("~p:init ~~ Accepted a WebSocket connection from peer ~p",
+               [?MODULE, cowboy_req:peer(Req)]),
     {cowboy_websocket, Req, Opts}.
 
 websocket_handle({text, Msg}, Req, State) ->
