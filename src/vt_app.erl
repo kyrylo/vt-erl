@@ -23,7 +23,7 @@ start(_StartType, _StartArgs) ->
     Dispatch = cowboy_router:compile(
                  [{'_',
                    [
-                    {"/", vt_web_handler, []},
+                    {"/", vt_http_handler, []},
                     {"/ws", vt_ws_handler, []}
                    ]
                   }]),
