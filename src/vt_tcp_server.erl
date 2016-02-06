@@ -13,7 +13,8 @@
         ,terminate/2
         ,code_change/3]).
 
--record(state, {socket}).
+-record(state, {socket
+               ,unparsed=nil}).
 
 %%====================================================================
 %% API
@@ -44,8 +45,14 @@ handle_cast(accept, State = #state{socket=ListenSocket}) ->
             {noreply, State}
     end.
 
-handle_info({tcp, _Socket, Data}, State) ->
-    {noreply, State};
+handle_info({tcp, Socket, Data}, State = #state{unparsed=Rest}) when Rest /= nil ->
+    {ok, NewState} = handle_streaming_data(<<Rest/binary, Data/binary>>, State),
+    inet:setopts(Socket, [{active, once}]),
+    {noreply, NewState};
+handle_info({tcp, Socket, Data}, State) ->
+    {ok, NewState} = handle_streaming_data(Data, State),
+    inet:setopts(Socket, [{active, once}]),
+    {noreply, NewState};
 handle_info({tcp_closed, _Socket}, State = #state{socket=AcceptSocket}) ->
     lager:info("~p:handle_info ~~ The TCP connection was closed on ~p", [?MODULE, AcceptSocket]),
     {stop, normal, State};
@@ -62,3 +69,17 @@ terminate(Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+%%====================================================================
+%% Private functions
+%%====================================================================
+
+handle_streaming_data(Data, State) ->
+    case Data of
+        <<DataSize:32/integer, "\r\n", Dgram:DataSize/binary, Rest/binary>> ->
+            {ok, [Parsed]} = rmarshal:load(Dgram),
+            lager:info("~p:handle_streaming_data ~~ ~p", [?MODULE, Parsed]),
+            handle_streaming_data(Rest, State);
+        Rest ->
+            {ok, State#state{unparsed=Rest}}
+    end.
