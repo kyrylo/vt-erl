@@ -1,4 +1,4 @@
--module(vt_web_handler).
+-module(vt_http_handler).
 
 -export([init/2]).
 

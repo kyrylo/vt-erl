@@ -17,6 +17,7 @@ start() ->
     ok = application:start(syntax_tools),
     ok = application:start(goldrush),
     ok = application:start(lager),
+    ok = application:start(rmarshal),
     ok = application:start(vt).
 
 stop() ->

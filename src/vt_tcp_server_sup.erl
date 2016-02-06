@@ -35,6 +35,8 @@ start_socket() ->
 %%====================================================================
 
 init([]) ->
+    lager:info("~p:init ~~ Starting a TCP server - 127.0.0.1:~p",
+               [?MODULE, ?TCP_PORT]),
     case gen_tcp:listen(?TCP_PORT, ?TCP_OPTIONS) of
         {ok, ListenSocket} ->
             spawn_link(fun start_socket/0),
